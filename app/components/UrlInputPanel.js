@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X, Play } from "lucide-react";
+import { Plus, X, Play, Upload } from "lucide-react";
 
-export default function UrlInputPanel({ onLoad }) {
-    const [urls, setUrls] = useState([
+export default function UrlInputPanel({ onLoad, initialUrls }) {
+    const [urls, setUrls] = useState(initialUrls || [
         "",
         ""
     ]);
@@ -28,10 +28,18 @@ export default function UrlInputPanel({ onLoad }) {
         setError(null);
     };
 
+    const handleFileUpload = (index, e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const objectUrl = URL.createObjectURL(file);
+            updateUrl(index, objectUrl);
+        }
+    };
+
     const handleLoad = () => {
-        const valid = urls.every(url => url.trim().endsWith(".mp4"));
+        const valid = urls.every(url => url.trim().endsWith(".mp4") || url.trim().startsWith("blob:"));
         if (!valid) {
-            setError("All URLs must end with .mp4");
+            setError("All URLs must be .mp4 links or local videos");
             return;
         }
         if (urls.some(url => !url.trim())) {
@@ -61,6 +69,22 @@ export default function UrlInputPanel({ onLoad }) {
             <div className="space-y-4">
                 {urls.map((url, index) => (
                     <div key={index} className="flex gap-2 relative">
+                        <div className="flex-shrink-0">
+                            <input
+                                type="file"
+                                accept="video/*"
+                                onChange={(e) => handleFileUpload(index, e)}
+                                className="hidden"
+                                id={`file-upload-${index}`}
+                            />
+                            <label
+                                htmlFor={`file-upload-${index}`}
+                                className="h-full flex items-center justify-center p-3 text-gray-500 hover:text-accent hover:bg-gray-800 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-gray-700 bg-gray-900 border-gray-700"
+                                title="Upload Local Video"
+                            >
+                                <Upload size={20} />
+                            </label>
+                        </div>
                         <input
                             type="text"
                             value={url}

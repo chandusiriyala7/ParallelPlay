@@ -8,6 +8,12 @@ import ControlBar from "./components/ControlBar";
 
 export default function Home() {
   const [videoUrls, setVideoUrls] = useState(null);
+  const [savedUrls, setSavedUrls] = useState(["", ""]);
+
+  const handleLoad = (urls) => {
+    setVideoUrls(urls);
+    setSavedUrls(urls);
+  };
 
   return (
     <SyncProvider>
@@ -36,7 +42,7 @@ export default function Home() {
         {/* Content */}
         <div className="flex-1 flex flex-col justify-center items-center pt-24 pb-32 px-4 transition-all duration-700 animate-in fade-in slide-in-from-bottom-4">
           {!videoUrls ? (
-            <UrlInputPanel onLoad={setVideoUrls} />
+            <UrlInputPanel onLoad={handleLoad} initialUrls={savedUrls} />
           ) : (
             <>
               <VideoGrid urls={videoUrls} />
